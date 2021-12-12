@@ -33,6 +33,10 @@ impl Solution for Day1 {
             .filter(|[x1, x2]| x2 > x1)
             .count()
     }
+
+    fn day() -> usize {
+        1
+    }
 }
 
 #[cfg(test)]
