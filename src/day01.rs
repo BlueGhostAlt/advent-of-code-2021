@@ -1,35 +1,44 @@
-pub fn part1(input: &str) -> usize {
-    let nums = input
-        .lines()
-        .map(|l| l.parse::<i32>().unwrap())
-        .collect::<Vec<_>>();
+use std::num::ParseIntError;
 
-    nums.array_windows::<2>()
-        .map(|[x1, x2]| x2 > x1)
-        .filter(|x| *x)
-        .count()
-}
+use crate::solution::Solution;
 
-pub fn part2(input: &str) -> usize {
-    let nums = input
-        .lines()
-        .map(|l| l.parse::<i32>().unwrap())
-        .collect::<Vec<_>>();
+pub struct Day1;
 
-    let window_sums = nums
-        .array_windows::<3>()
-        .map(|w| w.iter().sum::<i32>())
-        .collect::<Vec<_>>();
+impl Solution for Day1 {
+    type Input = Vec<i32>;
+    type ParseError = ParseIntError;
 
-    window_sums
-        .array_windows::<2>()
-        .map(|[x1, x2]| x2 > x1)
-        .filter(|x| *x)
-        .count()
+    type P1 = usize;
+    type P2 = usize;
+
+    fn parse(input: &str) -> Result<Self::Input, Self::ParseError> {
+        input.lines().map(|l| l.parse()).collect()
+    }
+
+    fn part1(input: &Self::Input) -> Self::P1 {
+        input
+            .array_windows::<2>()
+            .filter(|[x1, x2]| x2 > x1)
+            .count()
+    }
+
+    fn part2(input: &Self::Input) -> Self::P2 {
+        let window_sums = input
+            .array_windows::<3>()
+            .map(|w| w.iter().sum::<i32>())
+            .collect::<Vec<_>>();
+
+        window_sums
+            .array_windows::<2>()
+            .filter(|[x1, x2]| x2 > x1)
+            .count()
+    }
 }
 
 #[cfg(test)]
 mod tests {
+
+    use crate::solution::Solution;
 
     const INPUT: &str = "199
 200
@@ -43,12 +52,7 @@ mod tests {
 263";
 
     #[test]
-    fn part1() {
-        assert_eq!(super::part1(INPUT), 7);
-    }
-
-    #[test]
-    fn part2() {
-        assert_eq!(super::part2(INPUT), 5);
+    fn test() {
+        assert_eq!(super::Day1::solve(INPUT), Ok((7, 5)));
     }
 }
