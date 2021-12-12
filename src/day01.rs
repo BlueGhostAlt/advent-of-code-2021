@@ -10,6 +10,24 @@ pub fn part1(input: &str) -> usize {
         .count()
 }
 
+pub fn part2(input: &str) -> usize {
+    let nums = input
+        .lines()
+        .map(|l| l.parse::<i32>().unwrap())
+        .collect::<Vec<_>>();
+
+    let window_sums = nums
+        .array_windows::<3>()
+        .map(|w| w.iter().sum::<i32>())
+        .collect::<Vec<_>>();
+
+    window_sums
+        .array_windows::<2>()
+        .map(|[x1, x2]| x2 > x1)
+        .filter(|x| *x)
+        .count()
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -27,5 +45,10 @@ mod tests {
     #[test]
     fn part1() {
         assert_eq!(super::part1(INPUT), 7);
+    }
+
+    #[test]
+    fn part2() {
+        assert_eq!(super::part2(INPUT), 5);
     }
 }
