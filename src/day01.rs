@@ -23,14 +23,9 @@ impl Solution for Day01 {
     }
 
     fn part2(input: &Self::Input) -> Self::P2 {
-        let window_sums = input
-            .array_windows::<3>()
-            .map(|w| w.iter().sum::<i32>())
-            .collect::<Vec<_>>();
-
-        window_sums
-            .array_windows::<2>()
-            .filter(|[x1, x2]| x2 > x1)
+        input
+            .array_windows::<4>()
+            .filter(|[a, _, _, d]| d > a)
             .count()
     }
 }
