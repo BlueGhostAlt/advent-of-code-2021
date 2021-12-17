@@ -1,8 +1,6 @@
 #![feature(array_windows)]
 
-use crate::solution::Solution;
-
-mod solution;
+use advent_of_code::Solution;
 
 mod day01;
 
@@ -13,7 +11,7 @@ fn main() {
 
     children.push(day01::Day1::run(INPUT[0], 1233, 1275));
 
-    let (_, parallel_dur) = solution::bench(move || {
+    let (_, parallel_dur) = advent_of_code::bench(move || {
         for child in children {
             let _handle = child.join();
         }
@@ -21,6 +19,6 @@ fn main() {
 
     println!(
         "\nTotal (parallel): {}ms",
-        solution::format_dur(parallel_dur)
+        advent_of_code::format_dur(parallel_dur)
     );
 }

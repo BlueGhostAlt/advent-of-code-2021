@@ -1,6 +1,6 @@
 use std::num::ParseIntError;
 
-use crate::solution::Solution;
+use advent_of_code::Solution;
 
 pub struct Day1;
 
@@ -42,7 +42,7 @@ impl Solution for Day1 {
 #[cfg(test)]
 mod tests {
 
-    use crate::solution::Solution;
+    use advent_of_code::Solution;
 
     const INPUT: &str = "199
 200
