@@ -31,7 +31,32 @@ where
     (res, now.elapsed())
 }
 
-pub trait Solution {
+pub trait Day {
+    fn day() -> usize;
+
+    fn input() -> &'static str;
+}
+
+#[macro_export]
+macro_rules! day {
+    ($day: expr) => {
+        paste::paste! {
+            pub struct [<Day $day>];
+
+            impl Day for [<Day $day>] {
+                fn day() -> usize {
+                    $day
+                }
+
+                fn input() -> &'static str {
+                    include_str!(concat!("../input/", stringify!($day), ".txt"))
+                }
+            }
+        }
+    };
+}
+
+pub trait Solution: Day {
     type Input;
     type ParseError: Error;
 
@@ -78,6 +103,4 @@ pub trait Solution {
             );
         })
     }
-
-    fn day() -> usize;
 }

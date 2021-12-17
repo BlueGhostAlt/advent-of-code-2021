@@ -1,15 +1,13 @@
 #![feature(array_windows)]
 
-use advent_of_code::Solution;
+use advent_of_code::{Day, Solution};
 
 mod day01;
-
-const INPUT: [&str; 1] = [include_str!("../input/01.txt")];
 
 fn main() {
     let mut children = Vec::with_capacity(32);
 
-    children.push(day01::Day1::run(INPUT[0], 1233, 1275));
+    children.push(day01::Day01::run(day01::Day01::input(), 1233, 1275));
 
     let (_, parallel_dur) = advent_of_code::bench(move || {
         for child in children {

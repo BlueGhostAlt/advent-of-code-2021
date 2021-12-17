@@ -1,10 +1,10 @@
 use std::num::ParseIntError;
 
-use advent_of_code::Solution;
+use advent_of_code::{day, Day, Solution};
 
-pub struct Day1;
+day!(01);
 
-impl Solution for Day1 {
+impl Solution for Day01 {
     type Input = Vec<i32>;
     type ParseError = ParseIntError;
 
@@ -33,10 +33,6 @@ impl Solution for Day1 {
             .filter(|[x1, x2]| x2 > x1)
             .count()
     }
-
-    fn day() -> usize {
-        1
-    }
 }
 
 #[cfg(test)]
@@ -57,6 +53,6 @@ mod tests {
 
     #[test]
     fn test() {
-        assert_eq!(super::Day1::solve(INPUT), Ok((7, 5)));
+        assert_eq!(super::Day01::solve(INPUT), Ok((7, 5)));
     }
 }
