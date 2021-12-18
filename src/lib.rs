@@ -59,8 +59,8 @@ pub trait Solution<'a>: Day {
     type Input: ops::Deref;
     type ParseError: error::Error;
 
-    type P1: fmt::Debug + fmt::Display + PartialEq + Send + 'static;
-    type P2: fmt::Debug + fmt::Display + PartialEq + Send + 'static;
+    type P1: fmt::Debug + PartialEq + Send + 'static;
+    type P2: fmt::Debug + PartialEq + Send + 'static;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError>;
 

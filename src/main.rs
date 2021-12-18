@@ -6,6 +6,7 @@ use advent_of_code::{Day, Solution};
 
 mod day01;
 mod day02;
+mod day03;
 
 fn main() {
     let mut children = Vec::<JoinHandle<()>>::with_capacity(32);
@@ -16,6 +17,7 @@ fn main() {
         1882980,
         1971232560,
     ));
+    children.push(day03::Day03::run(day03::Day03::input(), 1071734, 6124992));
 
     let (_, parallel_dur) = advent_of_code::bench(move || {
         for child in children {
