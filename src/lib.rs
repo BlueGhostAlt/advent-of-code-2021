@@ -1,7 +1,5 @@
 use std::{
-    error::Error,
-    fmt::{Debug, Display},
-    ops::Deref,
+    error, fmt, ops,
     thread::{self, JoinHandle},
     time::{Duration, Instant},
 };
@@ -44,7 +42,7 @@ macro_rules! day {
         paste::paste! {
             pub struct [<Day $day>];
 
-            impl Day for [<Day $day>] {
+            impl advent_of_code::Day for [<Day $day>] {
                 fn day() -> usize {
                     $day
                 }
@@ -57,20 +55,20 @@ macro_rules! day {
     };
 }
 
-pub trait Solution: Day {
-    type Input: Deref;
-    type ParseError: Error;
+pub trait Solution<'a>: Day {
+    type Input: ops::Deref;
+    type ParseError: error::Error;
 
-    type P1: Debug + Display + PartialEq + Send + 'static;
-    type P2: Debug + Display + PartialEq + Send + 'static;
+    type P1: fmt::Debug + fmt::Display + PartialEq + Send + 'static;
+    type P2: fmt::Debug + fmt::Display + PartialEq + Send + 'static;
 
-    fn parse(input: &str) -> Result<Self::Input, Self::ParseError>;
+    fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError>;
 
-    fn part1(input: &<Self::Input as Deref>::Target) -> Self::P1;
+    fn part1(input: &<Self::Input as ops::Deref>::Target) -> Self::P1;
 
-    fn part2(input: &<Self::Input as Deref>::Target) -> Self::P2;
+    fn part2(input: &<Self::Input as ops::Deref>::Target) -> Self::P2;
 
-    fn solve(input: &str) -> Result<(Self::P1, Self::P2), Self::ParseError> {
+    fn solve(input: &'a str) -> Result<(Self::P1, Self::P2), Self::ParseError> {
         let input = Self::parse(input)?;
 
         let p1 = Self::part1(&input);

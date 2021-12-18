@@ -1,10 +1,10 @@
 use std::num::ParseIntError;
 
-use advent_of_code::{day, Day, Solution};
+use advent_of_code::day;
 
 day!(01);
 
-impl Solution for Day01 {
+impl advent_of_code::Solution<'_> for Day01 {
     type Input = Vec<i32>;
     type ParseError = ParseIntError;
 
@@ -32,7 +32,6 @@ impl Solution for Day01 {
 
 #[cfg(test)]
 mod tests {
-
     use advent_of_code::Solution;
 
     const INPUT: &str = "199
