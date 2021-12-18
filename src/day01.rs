@@ -15,14 +15,14 @@ impl Solution for Day01 {
         input.lines().map(|l| l.parse()).collect()
     }
 
-    fn part1(input: &Self::Input) -> Self::P1 {
+    fn part1(input: &[i32]) -> Self::P1 {
         input
             .array_windows::<2>()
             .filter(|[x1, x2]| x2 > x1)
             .count()
     }
 
-    fn part2(input: &Self::Input) -> Self::P2 {
+    fn part2(input: &[i32]) -> Self::P2 {
         input
             .array_windows::<4>()
             .filter(|[a, _, _, d]| d > a)

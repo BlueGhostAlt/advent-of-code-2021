@@ -1,6 +1,7 @@
 use std::{
     error::Error,
     fmt::{Debug, Display},
+    ops::Deref,
     thread::{self, JoinHandle},
     time::{Duration, Instant},
 };
@@ -57,7 +58,7 @@ macro_rules! day {
 }
 
 pub trait Solution: Day {
-    type Input;
+    type Input: Deref;
     type ParseError: Error;
 
     type P1: Debug + Display + PartialEq + Send + 'static;
@@ -65,9 +66,9 @@ pub trait Solution: Day {
 
     fn parse(input: &str) -> Result<Self::Input, Self::ParseError>;
 
-    fn part1(input: &Self::Input) -> Self::P1;
+    fn part1(input: &<Self::Input as Deref>::Target) -> Self::P1;
 
-    fn part2(input: &Self::Input) -> Self::P2;
+    fn part2(input: &<Self::Input as Deref>::Target) -> Self::P2;
 
     fn solve(input: &str) -> Result<(Self::P1, Self::P2), Self::ParseError> {
         let input = Self::parse(input)?;
