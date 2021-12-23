@@ -3,29 +3,21 @@ use advent_of_code::day;
 day!(03);
 
 #[derive(Debug)]
-pub struct Line(Vec<bool>);
+pub struct Line {
+    inner: Vec<bool>,
+}
 
 impl Line {
-    #[inline]
-    fn inner(&self) -> &[bool] {
-        &self.0
-    }
-
-    #[inline]
-    fn inner_mut(&mut self) -> &mut [bool] {
-        &mut self.0
-    }
-
     fn width(&self) -> usize {
-        self.inner().len()
+        self.inner.len()
     }
 
     fn invert(&mut self) {
-        self.inner_mut().iter_mut().for_each(|x| *x = !*x);
+        self.inner.iter_mut().for_each(|x| *x = !*x);
     }
 
     fn to_decimal(&self) -> u32 {
-        self.inner()
+        self.inner
             .iter()
             .rev()
             .enumerate()
@@ -41,15 +33,16 @@ impl TryFrom<&str> for Line {
     type Error = ParseError;
 
     fn try_from(line: &str) -> Result<Self, Self::Error> {
-        Ok(Self(
-            line.bytes()
+        Ok(Self {
+            inner: line
+                .bytes()
                 .map(|c| match c {
                     b'0' => Ok(false),
                     b'1' => Ok(true),
                     _ => Err(ParseError::UnknownChar(c)),
                 })
                 .collect::<Result<_, _>>()?,
-        ))
+        })
     }
 }
 
@@ -68,11 +61,11 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
         let width = input.first().map(|l| l.width()).unwrap_or_default();
         let half = input.len() / 2;
 
-        let mut gamma_rate = Line(
-            (0..width)
-                .map(|i| input.iter().filter(|d| d.inner()[i]).count() > half)
+        let mut gamma_rate = Line {
+            inner: (0..width)
+                .map(|i| input.iter().filter(|d| d.inner[i]).count() > half)
                 .collect(),
-        );
+        };
 
         let gamma = gamma_rate.to_decimal();
         gamma_rate.invert();
@@ -90,14 +83,14 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
 
         fn filter_records(diagnostics: &mut Vec<&Line>, rating: Rating, bit_pos: usize) {
             let half = diagnostics.len();
-            let bits = diagnostics.iter().filter(|d| d.inner()[bit_pos]).count();
+            let bits = diagnostics.iter().filter(|d| d.inner[bit_pos]).count();
 
             let bit = match rating {
                 Rating::O2 => bits * 2 >= half,
                 Rating::CO2 => bits * 2 < half,
             };
 
-            diagnostics.retain(|l| l.inner()[bit_pos] == bit);
+            diagnostics.retain(|l| l.inner[bit_pos] == bit);
         }
 
         fn get_rating(diagnostics: &[Line], rating: Rating) -> u32 {
