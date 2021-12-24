@@ -29,20 +29,25 @@ impl Line {
     }
 }
 
+impl From<Vec<bool>> for Line {
+    fn from(inner: Vec<bool>) -> Self {
+        Line { inner }
+    }
+}
+
 impl TryFrom<&str> for Line {
     type Error = ParseError;
 
     fn try_from(line: &str) -> Result<Self, Self::Error> {
-        Ok(Self {
-            inner: line
-                .bytes()
+        Ok(Self::from(
+            line.bytes()
                 .map(|c| match c {
                     b'0' => Ok(false),
                     b'1' => Ok(true),
                     _ => Err(ParseError::UnknownChar(c)),
                 })
-                .collect::<Result<_, _>>()?,
-        })
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 
