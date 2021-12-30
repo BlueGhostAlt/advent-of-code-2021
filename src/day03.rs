@@ -33,7 +33,7 @@ impl Line {
 
 impl From<Vec<bool>> for Line {
     fn from(inner: Vec<bool>) -> Self {
-        Line { inner }
+        Self { inner }
     }
 }
 
@@ -61,11 +61,11 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
     type P2 = u32;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
-        input.lines().map(|l| l.parse()).collect()
+        input.lines().map(str::parse).collect()
     }
 
     fn part1(input: &[Line]) -> Self::P1 {
-        let width = input.first().map(|l| l.width()).unwrap_or_default();
+        let width = input.first().map(Line::width).unwrap_or_default();
         let half = input.len() / 2;
 
         let mut gamma_rate = Line {
@@ -101,7 +101,7 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
         }
 
         fn get_rating(diagnostics: &[Line], rating: Rating) -> u32 {
-            let width = diagnostics.first().map(|l| l.width()).unwrap_or_default();
+            let width = diagnostics.first().map(Line::width).unwrap_or_default();
             let mut diagnostics = diagnostics.iter().collect();
 
             (0..width)

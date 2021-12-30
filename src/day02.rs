@@ -20,9 +20,9 @@ impl str::FromStr for Command {
         let count = count.parse()?;
 
         match command {
-            "forward" => Ok(Command::Forward(count)),
-            "down" => Ok(Command::Down(count)),
-            "up" => Ok(Command::Up(count)),
+            "forward" => Ok(Self::Forward(count)),
+            "down" => Ok(Self::Down(count)),
+            "up" => Ok(Self::Up(count)),
             _ => Err(ParseError::UnknownCommand(String::from(command))),
         }
     }
@@ -36,7 +36,7 @@ impl advent_of_code::Solution<'_> for Day02 {
     type P2 = u32;
 
     fn parse(input: &str) -> Result<Self::Input, Self::ParseError> {
-        input.lines().map(|l| l.parse()).collect()
+        input.lines().map(str::parse).collect()
     }
 
     fn part1(input: &[Command]) -> Self::P1 {

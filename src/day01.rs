@@ -15,7 +15,7 @@ impl advent_of_code::Solution<'_> for Day01 {
     type P2 = usize;
 
     fn parse(input: &str) -> Result<Self::Input, Self::ParseError> {
-        input.lines().map(|l| l.parse()).collect()
+        input.lines().map(str::parse).collect()
     }
 
     fn part1(input: &[Depth]) -> Self::P1 {

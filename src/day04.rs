@@ -71,7 +71,7 @@ impl<const LEN: usize> Board<LEN> {
 
 impl<const LEN: usize> From<[[Square; LEN]; LEN]> for Board<LEN> {
     fn from(inner: [[Square; LEN]; LEN]) -> Self {
-        Board { inner }
+        Self { inner }
     }
 }
 
@@ -79,18 +79,16 @@ impl<const LEN: usize> str::FromStr for Board<LEN> {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Board::<LEN>::from(
+        Ok(Self::from(
             s.split('\n')
                 .map(|row| {
                     row.split_ascii_whitespace()
                         .map(|n| n.parse().map(Square::new).map_err(ParseError::from))
                         .collect::<Result<Vec<_>, _>>()
-                        .map(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))
-                        .flatten()
+                        .and_then(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))
                 })
                 .collect::<Result<Vec<_>, _>>()
-                .map(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))
-                .flatten()?,
+                .and_then(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))?,
         ))
     }
 }
@@ -112,12 +110,12 @@ impl<'a> advent_of_code::Solution<'a> for Day04 {
 
         let boards = boards
             .split("\n\n")
-            .map(|board| board.parse())
+            .map(str::parse)
             .collect::<Result<Vec<Board<SIDE_LEN>>, _>>()?;
 
         let draws = draws
             .split(',')
-            .map(|n| n.parse::<u8>())
+            .map(str::parse)
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(draws
@@ -133,9 +131,8 @@ impl<'a> advent_of_code::Solution<'a> for Day04 {
     fn part1(input: &[Draw]) -> Self::P1 {
         input
             .iter()
-            .find(|(_, boards)| boards.iter().any(|board| board.has_won()))
-            .map(|(draw, boards)| boards.iter().find_map(|board| board.score(*draw)))
-            .flatten()
+            .find(|(_, boards)| boards.iter().any(Board::has_won))
+            .and_then(|(draw, boards)| boards.iter().find_map(|board| board.score(*draw)))
     }
 
     fn part2(input: &[Draw]) -> Self::P2 {

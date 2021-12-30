@@ -68,7 +68,7 @@ impl str::FromStr for Line {
             y: y.parse()?,
         };
 
-        Ok(Line { start, end })
+        Ok(Self { start, end })
     }
 }
 
@@ -94,13 +94,13 @@ impl Iterator for Points {
     type Item = Point;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.line.start != self.line.end {
+        if self.line.start == self.line.end {
+            None
+        } else {
             self.line.start.x += self.step.x;
             self.line.start.y += self.step.y;
 
             Some(self.line.start)
-        } else {
-            None
         }
     }
 }
@@ -109,8 +109,7 @@ fn count_overlaps<'a, I>(iter: I) -> usize
 where
     I: Iterator<Item = &'a Line>,
 {
-    iter.map(|line| line.points())
-        .flatten()
+    iter.flat_map(Line::points)
         .fold(HashMap::new(), |mut acc, p| {
             *acc.entry(p).or_insert(0) += 1;
             acc
@@ -128,7 +127,7 @@ impl<'a> advent_of_code::Solution<'a> for Day05 {
     type P2 = u32;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
-        input.lines().map(|l| l.parse()).collect()
+        input.lines().map(str::parse).collect()
     }
 
     fn part1(input: &[Line]) -> Self::P1 {
