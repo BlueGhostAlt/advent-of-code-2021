@@ -8,6 +8,7 @@ mod day01;
 mod day02;
 mod day03;
 mod day04;
+mod day05;
 
 fn main() {
     let mut children = Vec::<JoinHandle<()>>::with_capacity(32);
@@ -24,6 +25,7 @@ fn main() {
         Some(49860),
         Some(24628),
     ));
+    children.push(day05::Day05::run(day05::Day05::input(), 6856, 20666));
 
     let (_, parallel_dur) = advent_of_code::bench(move || {
         for child in children {
