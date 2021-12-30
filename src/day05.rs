@@ -123,19 +123,19 @@ impl<'a> advent_of_code::Solution<'a> for Day05 {
     type Input = Vec<Line>;
     type ParseError = ParseError;
 
-    type P1 = u32;
-    type P2 = u32;
+    type P1 = usize;
+    type P2 = usize;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
         input.lines().map(str::parse).collect()
     }
 
     fn part1(input: &[Line]) -> Self::P1 {
-        count_overlaps(input.iter().filter(|line| !line.is_diagonal())) as u32
+        count_overlaps(input.iter().filter(|line| !line.is_diagonal()))
     }
 
     fn part2(input: &[Line]) -> Self::P2 {
-        count_overlaps(input.iter()) as u32
+        count_overlaps(input.iter())
     }
 }
 
