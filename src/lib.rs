@@ -1,24 +1,9 @@
 use std::{
     error, fmt, ops,
-    thread::{self, JoinHandle},
+    sync::mpsc::channel,
+    thread,
     time::{Duration, Instant},
 };
-
-const MILLISECOND: Duration = Duration::from_millis(1);
-
-pub fn format_dur(dur: Duration) -> String {
-    if dur.as_nanos() > MILLISECOND.as_nanos() {
-        format!(
-            "{:.2}",
-            dur.as_nanos() as f64 / MILLISECOND.as_nanos() as f64
-        )
-    } else {
-        format!(
-            "{:.3}",
-            dur.as_nanos() as f64 / MILLISECOND.as_nanos() as f64
-        )
-    }
-}
 
 pub fn bench<F, R>(fun: F) -> (R, Duration)
 where
@@ -55,6 +40,38 @@ macro_rules! day {
     };
 }
 
+#[derive(Debug)]
+pub struct DayBench<P1, P2>
+where
+    P1: fmt::Debug + PartialEq + Send + 'static,
+    P2: fmt::Debug + PartialEq + Send + 'static,
+{
+    pub part1: (P1, Duration),
+    pub part2: (P2, Duration),
+    pub total: Duration,
+}
+
+#[derive(Debug)]
+pub enum RunError {
+    Unexpected(Box<dyn fmt::Debug + Send>, Box<dyn fmt::Debug + Send>),
+}
+
+impl fmt::Display for RunError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Unexpected(ex, ac) => {
+                write!(f, "expected answer {:?} but instead got {:?}", ex, ac)
+            }
+        }
+    }
+}
+
+impl error::Error for RunError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        None
+    }
+}
+
 pub trait Solution<'a>: Day {
     type Input: ops::Deref;
     type ParseError: error::Error;
@@ -77,7 +94,13 @@ pub trait Solution<'a>: Day {
         Ok((p1, p2))
     }
 
-    fn run(input: &'static str, ans1: Self::P1, ans2: Self::P2) -> JoinHandle<()> {
+    fn run(
+        input: &'static str,
+        ans1: Self::P1,
+        ans2: Self::P2,
+    ) -> Result<DayBench<Self::P1, Self::P2>, RunError> {
+        let (tx, rx) = channel();
+
         thread::spawn(move || {
             let input = Self::parse(input).unwrap();
 
@@ -88,41 +111,44 @@ pub trait Solution<'a>: Day {
                 ((p1, p1_dur), (p2, p2_dur))
             });
 
-            assert_eq!(p1, ans1);
-            assert_eq!(p2, ans2);
+            let res = if p1 != ans1 {
+                Err(RunError::Unexpected(Box::new(ans1), Box::new(p1)))
+            } else if p2 != ans2 {
+                Err(RunError::Unexpected(Box::new(ans1), Box::new(p1)))
+            } else {
+                Ok(DayBench {
+                    part1: (p1, p1_dur),
+                    part2: (p2, p2_dur),
+                    total: total_dur,
+                })
+            };
 
-            println!(
-                "Day {} ({}ms):\n    Part 1: {:?} ({}ms)\n    Part 2: {:?} ({}ms)",
-                Self::day(),
-                format_dur(total_dur),
-                p1,
-                format_dur(p1_dur),
-                p2,
-                format_dur(p2_dur)
-            );
-        })
+            tx.send(res).unwrap();
+        });
+
+        rx.recv().unwrap()
     }
 }
 
 #[macro_export]
 macro_rules! days {
-    ($($day: expr => ($ans1: expr, $ans2: expr)),*) => {
+    ($($day: expr => ($ans1: expr, $ans2: expr)),+) => {
         paste::paste! {
-            let mut days = Vec::with_capacity(32);
+            let now = std::time::Instant::now();
+
             $(
-                days.push([<day $day>]::[<Day $day>]::run([<day $day>]::[<Day $day>]::input(), $ans1, $ans2));
-            )*
+                let [<day_ $day>] = [<day $day>]::[<Day $day>]::run([<day $day>]::[<Day $day>]::input(), $ans1, $ans2).unwrap();
+            )+
+
+            let total = now.elapsed();
+
+            $(
+                println!(
+                    "Day {}({:?}):\n    Part 1({:?}): {:?}\n    Part 2({:?}): {:?}",
+                    $day, [<day_ $day>].total, [<day_ $day>].part1.1, [<day_ $day>].part1.0, [<day_ $day>].part2.1, [<day_ $day>].part2.0
+                );
+            )+
+            println!("\nTotal: {:?}", total);
         }
-
-        let (_, parallel_dur) = advent_of_code::bench(move || {
-            for day in days {
-                let _handle = day.join();
-            }
-        });
-
-        println!(
-            "\nTotal (parallel): {}ms",
-            advent_of_code::format_dur(parallel_dur)
-        );
     };
 }
