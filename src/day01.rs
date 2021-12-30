@@ -4,9 +4,12 @@ use advent_of_code::day;
 
 day!(01);
 
+type ParseError = ParseIntError;
+type Depth = i32;
+
 impl advent_of_code::Solution<'_> for Day01 {
-    type Input = Vec<i32>;
-    type ParseError = ParseIntError;
+    type Input = Vec<Depth>;
+    type ParseError = ParseError;
 
     type P1 = usize;
     type P2 = usize;
@@ -15,14 +18,14 @@ impl advent_of_code::Solution<'_> for Day01 {
         input.lines().map(|l| l.parse()).collect()
     }
 
-    fn part1(input: &[i32]) -> Self::P1 {
+    fn part1(input: &[Depth]) -> Self::P1 {
         input
             .array_windows::<2>()
             .filter(|[x1, x2]| x2 > x1)
             .count()
     }
 
-    fn part2(input: &[i32]) -> Self::P2 {
+    fn part2(input: &[Depth]) -> Self::P2 {
         input
             .array_windows::<4>()
             .filter(|[a, _, _, d]| d > a)

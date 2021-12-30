@@ -1,4 +1,4 @@
-use std::num::ParseIntError;
+use std::{num::ParseIntError, str};
 
 use advent_of_code::day;
 
@@ -11,29 +11,32 @@ pub enum Command {
     Up(u32),
 }
 
-impl<'a> advent_of_code::Solution<'a> for Day02 {
+impl str::FromStr for Command {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (command, count) = s.split_once(' ').ok_or(ParseError::ExpectedWhitespace)?;
+
+        let count = count.parse()?;
+
+        match command {
+            "forward" => Ok(Command::Forward(count)),
+            "down" => Ok(Command::Down(count)),
+            "up" => Ok(Command::Up(count)),
+            _ => Err(ParseError::UnknownCommand(String::from(command))),
+        }
+    }
+}
+
+impl advent_of_code::Solution<'_> for Day02 {
     type Input = Vec<Command>;
-    type ParseError = ParseError<'a>;
+    type ParseError = ParseError;
 
     type P1 = u32;
     type P2 = u32;
 
-    fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
-        input
-            .lines()
-            .map(|l| {
-                let (command, count) = l.split_once(' ').ok_or(ParseError::ExpectedWhitespace)?;
-
-                let count = count.parse()?;
-
-                match command {
-                    "forward" => Ok(Command::Forward(count)),
-                    "down" => Ok(Command::Down(count)),
-                    "up" => Ok(Command::Up(count)),
-                    _ => Err(ParseError::UnknownCommand(command)),
-                }
-            })
-            .collect()
+    fn parse(input: &str) -> Result<Self::Input, Self::ParseError> {
+        input.lines().map(|l| l.parse()).collect()
     }
 
     fn part1(input: &[Command]) -> Self::P1 {
@@ -58,13 +61,13 @@ impl<'a> advent_of_code::Solution<'a> for Day02 {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum ParseError<'a> {
-    UnknownCommand(&'a str),
+pub enum ParseError {
+    UnknownCommand(String),
     ExpectedWhitespace,
     NotAnInt(ParseIntError),
 }
 
-impl<'a> From<ParseIntError> for ParseError<'a> {
+impl From<ParseIntError> for ParseError {
     fn from(err: ParseIntError) -> Self {
         Self::NotAnInt(err)
     }
@@ -72,7 +75,7 @@ impl<'a> From<ParseIntError> for ParseError<'a> {
 
 use std::{error, fmt};
 
-impl<'a> fmt::Display for ParseError<'a> {
+impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::UnknownCommand(command) => write!(f, "unknown command \"{}\"", command),
@@ -82,7 +85,7 @@ impl<'a> fmt::Display for ParseError<'a> {
     }
 }
 
-impl<'a> error::Error for ParseError<'a> {
+impl error::Error for ParseError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match self {
             Self::NotAnInt(parse_int_err) => Some(parse_int_err),

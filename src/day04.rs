@@ -1,4 +1,4 @@
-use std::{cell::Cell, num::ParseIntError};
+use std::{cell::Cell, num::ParseIntError, str};
 
 use advent_of_code::day;
 
@@ -7,12 +7,12 @@ day!(04);
 const SIDE_LEN: usize = 5;
 
 #[derive(Debug, Clone)]
-struct BoardCell {
+struct Square {
     value: Cell<u8>,
     marked: Cell<bool>,
 }
 
-impl BoardCell {
+impl Square {
     fn new(n: u8) -> Self {
         Self {
             value: Cell::new(n),
@@ -23,7 +23,7 @@ impl BoardCell {
 
 #[derive(Debug, Clone)]
 pub struct Board<const LEN: usize> {
-    inner: [[BoardCell; LEN]; LEN],
+    inner: [[Square; LEN]; LEN],
 }
 
 impl<const LEN: usize> Board<LEN> {
@@ -69,22 +69,21 @@ impl<const LEN: usize> Board<LEN> {
     }
 }
 
-impl<const LEN: usize> From<[[BoardCell; LEN]; LEN]> for Board<LEN> {
-    fn from(inner: [[BoardCell; LEN]; LEN]) -> Self {
+impl<const LEN: usize> From<[[Square; LEN]; LEN]> for Board<LEN> {
+    fn from(inner: [[Square; LEN]; LEN]) -> Self {
         Board { inner }
     }
 }
 
-impl<const LEN: usize> TryFrom<&str> for Board<LEN> {
-    type Error = ParseError;
+impl<const LEN: usize> str::FromStr for Board<LEN> {
+    type Err = ParseError;
 
-    fn try_from(board: &str) -> Result<Self, Self::Error> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Board::<LEN>::from(
-            board
-                .split('\n')
+            s.split('\n')
                 .map(|row| {
                     row.split_ascii_whitespace()
-                        .map(|n| n.parse().map(BoardCell::new).map_err(ParseError::from))
+                        .map(|n| n.parse().map(Square::new).map_err(ParseError::from))
                         .collect::<Result<Vec<_>, _>>()
                         .map(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))
                         .flatten()
@@ -96,8 +95,10 @@ impl<const LEN: usize> TryFrom<&str> for Board<LEN> {
     }
 }
 
+type Draw = (u8, Box<[Board<SIDE_LEN>]>);
+
 impl<'a> advent_of_code::Solution<'a> for Day04 {
-    type Input = Vec<(u8, Box<[Board<SIDE_LEN>]>)>;
+    type Input = Vec<Draw>;
     type ParseError = ParseError;
 
     type P1 = Option<u32>;
@@ -111,39 +112,25 @@ impl<'a> advent_of_code::Solution<'a> for Day04 {
 
         let boards = boards
             .split("\n\n")
-            .map(|board| {
-                board
-                    .split('\n')
-                    .map(|row| {
-                        row.split_ascii_whitespace()
-                            .map(|n| n.parse().map(BoardCell::new).map_err(ParseError::from))
-                            .collect::<Result<Vec<_>, _>>()
-                            .map(|vec| <[_; 5]>::try_from(vec).map_err(ParseError::from))
-                            .flatten()
-                    })
-                    .collect::<Result<Vec<_>, _>>()
-                    .map(|vec| <[_; 5]>::try_from(vec).map_err(ParseError::from))
-                    .flatten()
-                    .map(|board| Board { inner: board })
-            })
+            .map(|board| board.parse())
             .collect::<Result<Vec<Board<SIDE_LEN>>, _>>()?;
 
         let draws = draws
             .split(',')
-            .map(|n| {
-                n.parse::<u8>()
-                    .map(|num| {
-                        boards.iter().for_each(|b| b.draw(num));
-                        (num, boards.clone().into_boxed_slice())
-                    })
-                    .map_err(ParseError::from)
-            })
-            .collect::<Result<Vec<_>, _>>();
+            .map(|n| n.parse::<u8>())
+            .collect::<Result<Vec<_>, _>>()?;
 
-        draws
+        Ok(draws
+            .iter()
+            .map(|&num| {
+                boards.iter().for_each(|b| b.draw(num));
+
+                (num, boards.clone().into_boxed_slice())
+            })
+            .collect())
     }
 
-    fn part1(input: &[(u8, Box<[Board<SIDE_LEN>]>)]) -> Self::P1 {
+    fn part1(input: &[Draw]) -> Self::P1 {
         input
             .iter()
             .find(|(_, boards)| boards.iter().any(|board| board.has_won()))
@@ -151,7 +138,7 @@ impl<'a> advent_of_code::Solution<'a> for Day04 {
             .flatten()
     }
 
-    fn part2(input: &[(u8, Box<[Board<SIDE_LEN>]>)]) -> Self::P2 {
+    fn part2(input: &[Draw]) -> Self::P2 {
         input
             .array_windows::<2>()
             .find_map(|[(_, previous_boards), (num, boards)]| {

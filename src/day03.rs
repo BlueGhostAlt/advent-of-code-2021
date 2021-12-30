@@ -1,3 +1,5 @@
+use std::str;
+
 use advent_of_code::day;
 
 day!(03);
@@ -35,12 +37,12 @@ impl From<Vec<bool>> for Line {
     }
 }
 
-impl TryFrom<&str> for Line {
-    type Error = ParseError;
+impl str::FromStr for Line {
+    type Err = ParseError;
 
-    fn try_from(line: &str) -> Result<Self, Self::Error> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self::from(
-            line.bytes()
+            s.bytes()
                 .map(|c| match c {
                     b'0' => Ok(false),
                     b'1' => Ok(true),
@@ -59,7 +61,7 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
     type P2 = u32;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
-        input.lines().map(|l| Line::try_from(l)).collect()
+        input.lines().map(|l| l.parse()).collect()
     }
 
     fn part1(input: &[Line]) -> Self::P1 {
@@ -102,17 +104,15 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
             let width = diagnostics.first().map(|l| l.width()).unwrap_or_default();
             let mut diagnostics = diagnostics.iter().collect();
 
-            for i in 0..width {
-                filter_records(&mut diagnostics, rating, i);
+            (0..width)
+                .find_map(|i| {
+                    filter_records(&mut diagnostics, rating, i);
 
-                if diagnostics.len() == 1 {
-                    break;
-                }
-            }
-
-            diagnostics
-                .first()
-                .map(|l| l.to_decimal())
+                    match diagnostics.first() {
+                        Some(l) if diagnostics.len() == 1 => Some(l.to_decimal()),
+                        _ => None,
+                    }
+                })
                 .unwrap_or_default()
         }
 
