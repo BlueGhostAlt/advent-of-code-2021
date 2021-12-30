@@ -1,8 +1,6 @@
 use std::{collections::HashMap, num::ParseIntError, ops, str};
 
-use advent_of_code::day;
-
-day!(05);
+advent_of_code::day!(05);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Point {

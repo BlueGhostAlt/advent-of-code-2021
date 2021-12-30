@@ -1,8 +1,6 @@
 use std::{cell::Cell, num::ParseIntError, str};
 
-use advent_of_code::day;
-
-day!(04);
+advent_of_code::day!(04);
 
 const SIDE_LEN: usize = 5;
 

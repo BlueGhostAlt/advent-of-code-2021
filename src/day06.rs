@@ -1,8 +1,6 @@
 use std::{num::ParseIntError, str};
 
-use advent_of_code::day;
-
-day!(06);
+advent_of_code::day!(06);
 
 const MAX_TIME: usize = 8;
 

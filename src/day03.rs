@@ -1,8 +1,6 @@
 use std::str;
 
-use advent_of_code::day;
-
-day!(03);
+advent_of_code::day!(03);
 
 #[derive(Debug)]
 pub struct Line {

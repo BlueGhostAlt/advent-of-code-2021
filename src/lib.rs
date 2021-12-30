@@ -103,3 +103,26 @@ pub trait Solution<'a>: Day {
         })
     }
 }
+
+#[macro_export]
+macro_rules! days {
+    ($($day: expr => ($ans1: expr, $ans2: expr)),*) => {
+        paste::paste! {
+            let mut days = Vec::with_capacity(32);
+            $(
+                days.push([<day $day>]::[<Day $day>]::run([<day $day>]::[<Day $day>]::input(), $ans1, $ans2));
+            )*
+        }
+
+        let (_, parallel_dur) = advent_of_code::bench(move || {
+            for day in days {
+                let _handle = day.join();
+            }
+        });
+
+        println!(
+            "\nTotal (parallel): {}ms",
+            advent_of_code::format_dur(parallel_dur)
+        );
+    };
+}

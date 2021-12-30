@@ -1,8 +1,6 @@
 use std::num::ParseIntError;
 
-use advent_of_code::day;
-
-day!(01);
+advent_of_code::day!(01);
 
 type ParseError = ParseIntError;
 type Depth = i32;

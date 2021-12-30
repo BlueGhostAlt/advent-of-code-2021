@@ -1,8 +1,6 @@
 use std::{num::ParseIntError, str};
 
-use advent_of_code::day;
-
-day!(02);
+advent_of_code::day!(02);
 
 #[derive(Debug)]
 pub enum Command {
