@@ -114,7 +114,7 @@ pub trait Solution<'a>: Day {
             let res = if p1 != ans1 {
                 Err(RunError::Unexpected(Box::new(ans1), Box::new(p1)))
             } else if p2 != ans2 {
-                Err(RunError::Unexpected(Box::new(ans1), Box::new(p1)))
+                Err(RunError::Unexpected(Box::new(ans2), Box::new(p2)))
             } else {
                 Ok(DayBench {
                     part1: (p1, p1_dur),
