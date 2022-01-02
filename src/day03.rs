@@ -55,15 +55,15 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
     type Input = Vec<Line>;
     type ParseError = ParseError;
 
-    type P1 = u32;
-    type P2 = u32;
+    type P1 = Option<u32>;
+    type P2 = Option<u32>;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
         input.lines().map(str::parse).collect()
     }
 
     fn part1(input: &[Line]) -> Self::P1 {
-        let width = input.first().map(Line::width).unwrap_or_default();
+        let width = input.first()?.width();
         let half = input.len() / 2;
 
         let mut gamma_rate = Line {
@@ -76,7 +76,7 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
         gamma_rate.invert();
         let epsilon = gamma_rate.to_decimal();
 
-        gamma * epsilon
+        Some(gamma * epsilon)
     }
 
     fn part2(input: &[Line]) -> Self::P2 {
@@ -98,26 +98,24 @@ impl<'a> advent_of_code::Solution<'a> for Day03 {
             diagnostics.retain(|l| l.inner[bit_pos] == bit);
         }
 
-        fn get_rating(diagnostics: &[Line], rating: Rating) -> u32 {
-            let width = diagnostics.first().map(Line::width).unwrap_or_default();
+        fn get_rating(diagnostics: &[Line], rating: Rating) -> Option<u32> {
+            let width = diagnostics.first()?.width();
             let mut diagnostics = diagnostics.iter().collect();
 
-            (0..width)
-                .find_map(|i| {
-                    filter_records(&mut diagnostics, rating, i);
+            (0..width).find_map(|i| {
+                filter_records(&mut diagnostics, rating, i);
 
-                    match diagnostics.first() {
-                        Some(l) if diagnostics.len() == 1 => Some(l.to_decimal()),
-                        _ => None,
-                    }
-                })
-                .unwrap_or_default()
+                match diagnostics.first() {
+                    Some(l) if diagnostics.len() == 1 => Some(l.to_decimal()),
+                    _ => None,
+                }
+            })
         }
 
-        let o2 = get_rating(input, Rating::O2);
-        let co2 = get_rating(input, Rating::CO2);
+        let o2 = get_rating(input, Rating::O2)?;
+        let co2 = get_rating(input, Rating::CO2)?;
 
-        o2 * co2
+        Some(o2 * co2)
     }
 }
 
@@ -161,6 +159,6 @@ mod tests {
 
     #[test]
     fn test() {
-        assert_eq!(super::Day03::solve(INPUT), Ok((198, 230)));
+        assert_eq!(super::Day03::solve(INPUT), Ok((Some(198), Some(230))));
     }
 }

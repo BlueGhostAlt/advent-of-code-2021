@@ -79,8 +79,8 @@ struct Points {
 impl Points {
     fn new(mut line: Line) -> Self {
         let step = Step {
-            x: (line.end.x - line.start.x).signum(),
-            y: (line.end.y - line.start.y).signum(),
+            x: i32::signum(line.end.x - line.start.x),
+            y: i32::signum(line.end.y - line.start.y),
         };
         line.start -= step;
 
