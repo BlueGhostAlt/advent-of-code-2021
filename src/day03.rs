@@ -134,11 +134,7 @@ impl fmt::Display for ParseError {
     }
 }
 
-impl error::Error for ParseError {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        None
-    }
-}
+impl error::Error for ParseError {}
 
 #[cfg(test)]
 mod tests {
