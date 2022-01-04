@@ -67,27 +67,22 @@ impl<const LEN: usize> Board<LEN> {
     }
 }
 
-impl<const LEN: usize> From<[[Square; LEN]; LEN]> for Board<LEN> {
-    fn from(inner: [[Square; LEN]; LEN]) -> Self {
-        Self { inner }
-    }
-}
-
 impl<const LEN: usize> str::FromStr for Board<LEN> {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self::from(
-            s.split('\n')
-                .map(|row| {
-                    row.split_ascii_whitespace()
-                        .map(|n| n.parse().map(Square::new).map_err(ParseError::from))
-                        .collect::<Result<Vec<_>, _>>()
-                        .and_then(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))
-                })
-                .collect::<Result<Vec<_>, _>>()
-                .and_then(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))?,
-        ))
+        let inner = s
+            .split('\n')
+            .map(|row| {
+                row.split_ascii_whitespace()
+                    .map(|n| n.parse().map(Square::new).map_err(ParseError::from))
+                    .collect::<Result<Vec<_>, _>>()
+                    .and_then(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .and_then(|vec| <[_; LEN]>::try_from(vec).map_err(ParseError::from))?;
+
+        Ok(Self { inner })
     }
 }
 

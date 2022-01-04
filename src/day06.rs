@@ -41,14 +41,14 @@ impl str::FromStr for Fish {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.trim()
-            .split(',')
-            .map(|n| n.parse::<usize>().map_err(ParseError::from))
-            .try_fold(Self { timers: [0; 9] }, |mut fish, t| {
+        s.trim().split(',').map(|n| n.parse::<usize>()).try_fold(
+            Self { timers: [0; 9] },
+            |mut fish, t| {
                 fish.add_timer(t?)?;
 
                 Ok(fish)
-            })
+            },
+        )
     }
 }
 
@@ -60,7 +60,7 @@ impl<'a> advent_of_code::Solution<'a> for Day06 {
     type P2 = u64;
 
     fn parse(input: &'a str) -> Result<Self::Input, Self::ParseError> {
-        Ok(Box::new(input.parse()?))
+        input.parse().map(Box::new)
     }
 
     fn part1(input: &Fish) -> Self::P1 {
