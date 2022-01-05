@@ -45,32 +45,32 @@ where
 }
 
 impl Heightmap {
+    fn point(&self, idx: usize) -> Option<Point> {
+        let height = *self.inner.get(idx)?;
+
+        Some(Point { height, idx })
+    }
+
     fn neighbours(&self, idx: usize) -> Vec<Point> {
         let idx = idx as isize;
         let width = self.width as isize;
+
         [
-            self.inner.get((idx - width) as usize),
-            self.inner.get((idx + width) as usize),
+            Some(idx - width),
+            Some(idx + width),
             if idx % width == 0 {
                 None
             } else {
-                self.inner.get(idx as usize - 1)
+                Some(idx - 1)
             },
             if idx % width == width - 1 {
                 None
             } else {
-                self.inner.get(idx as usize + 1)
+                Some(idx + 1)
             },
         ]
         .iter()
-        .zip([idx - width, idx + width, idx - 1, idx + 1].iter())
-        .filter_map(|(&height, &idx)| match height {
-            Some(&height) => Some(Point {
-                height,
-                idx: idx as usize,
-            }),
-            None => None,
-        })
+        .filter_map(|&idx| self.point(idx? as usize))
         .collect::<Vec<_>>()
     }
 
