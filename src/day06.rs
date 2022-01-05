@@ -27,9 +27,7 @@ impl Fish {
     }
 
     fn next_n(&mut self, n: usize) {
-        for _ in 0..n {
-            self.next();
-        }
+        (0..n).for_each(|_| self.next())
     }
 
     fn count(&self) -> u64 {
