@@ -1,4 +1,10 @@
-#![feature(array_windows, never_type, result_flattening)]
+#![feature(
+    array_windows,
+    never_type,
+    result_flattening,
+    result_into_ok_or_err,
+    option_result_contains
+)]
 
 use advent_of_code::{Day, Solution};
 
@@ -11,6 +17,7 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
 
 fn main() {
     advent_of_code::days!(
@@ -22,6 +29,7 @@ fn main() {
         06 => (355_386, 1_613_415_325_809),
         07 => (Some(342_730), Some(92_335_207)),
         08 => (470, Some(989_396)),
-        09 => (566, 891_684)
+        09 => (566, 891_684),
+        10 => (339_411, 2_289_754_624)
     );
 }
