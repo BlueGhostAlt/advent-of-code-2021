@@ -116,6 +116,6 @@ mod tests {
 
     #[test]
     fn test() {
-        assert_eq!(super::Day06::solve(INPUT), Ok((5934, 26984457539)));
+        assert_eq!(super::Day06::solve(INPUT), Ok((5_934, 26_984_457_539)));
     }
 }

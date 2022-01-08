@@ -160,6 +160,6 @@ mod tests {
 
     #[test]
     fn test() {
-        assert_eq!(super::Day09::solve(INPUT), Ok((15, 1134)));
+        assert_eq!(super::Day09::solve(INPUT), Ok((15, 1_134)));
     }
 }

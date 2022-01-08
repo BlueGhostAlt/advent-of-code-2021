@@ -214,6 +214,6 @@ mod tests {
 
     #[test]
     fn test() {
-        assert_eq!(super::Day04::solve(INPUT), Ok((Some(4512), Some(1924))));
+        assert_eq!(super::Day04::solve(INPUT), Ok((Some(4_512), Some(1_924))));
     }
 }

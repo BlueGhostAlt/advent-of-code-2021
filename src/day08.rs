@@ -116,6 +116,6 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test() {
-        assert_eq!(super::Day08::solve(INPUT), Ok((26, Some(61229))));
+        assert_eq!(super::Day08::solve(INPUT), Ok((26, Some(61_229))));
     }
 }
